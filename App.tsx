@@ -98,7 +98,7 @@ function App() {
         <div className="flex-grow h-full relative p-4">
           { (viewMode === ViewMode.SCENE_3D) ? (
             <ThreeScene 
-              activeChakra={activeChakra}
+              activeChakra={activeChakraIndex} 
               activeFrequency={frequencies[activeChakraIndex]}
               isSessionActive={isSessionActive}
               intensity={currentSession ? Math.min(1, (Date.now() - currentSession.startTime!) / 60000) : 0}
