@@ -1,7 +1,10 @@
-
 import React from 'react';
-import { Chakra, SessionLog } from '../types';
-import { ViewMode } from '../types';
+import { Chakra, SessionLog, ViewMode } from '../types';
+import EyeIcon from './icons/EyeIcon';
+import CubeIcon from './icons/CubeIcon';
+import PlayIcon from './icons/PlayIcon';
+import PauseIcon from './icons/PauseIcon';
+import './ControlPanel.css';
 
 interface ControlPanelProps {
   chakras: Chakra[];
@@ -18,19 +21,23 @@ interface ControlPanelProps {
   sessionLogs: SessionLog[];
 }
 
-const ChakraSelector: React.FC<{ chakra: Chakra; isActive: boolean; onClick: () => void }> = ({ chakra, isActive, onClick }) => (
-  <button
-    onClick={onClick}
-    className={`w-full text-left p-3 rounded-lg border-2 transition-all duration-300 ${
-      isActive ? 'border-brand-text/80 shadow-lg' : 'border-brand-outline hover:border-brand-text/50 bg-brand-bg/50'
-    }`}
-    style={{ backgroundColor: isActive ? chakra.color : undefined }}
-    aria-pressed={isActive}
-  >
-    <div className={`font-bold text-lg ${isActive ? 'text-black' : 'text-brand-text'}`}>{chakra.name}</div>
-    <div className={`text-sm ${isActive ? 'text-black/80' : 'text-brand-text-muted'}`}>{chakra.description}</div>
-  </button>
-);
+const ChakraSelector: React.FC<{ chakra: Chakra; isActive: boolean; onClick: () => void }> = ({ chakra, isActive, onClick }) => {
+  const baseClasses = 'w-full text-left p-3 rounded-lg border-2 transition-all duration-300';
+  const activeClasses = 'shadow-lg';
+  const inactiveClasses = 'border-brand-outline bg-brand-bg/50 hover:border-brand-text/50';
+
+  return (
+    <button
+      onClick={onClick}
+      className={`${baseClasses} ${isActive ? `chakra-selector ${activeClasses}` : inactiveClasses}`}
+      aria-pressed={isActive ? 'true' : 'false'}
+      style={isActive ? { '--chakra-color': chakra.color } as React.CSSProperties : {}}
+    >
+      <div className={`text-xl font-semibold ${isActive ? 'text-black' : 'text-brand-text'}`}>{chakra.name}</div>
+      <div className={`text-sm h-10 ${isActive ? 'text-black/80' : 'text-brand-text-muted'}`}>{chakra.description}</div>
+    </button>
+  );
+};
 
 const StarRatingDisplay: React.FC<{ rating: number }> = ({ rating }) => (
   <div className="flex">
@@ -79,9 +86,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = (props) => {
         <div className="flex items-center justify-between space-x-2">
             <button
                 onClick={toggleSession}
-                className={`px-6 py-3 rounded-full text-lg font-bold transition-all w-32 ${isSessionActive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}
+                className={`px-6 py-3 rounded-full text-lg font-bold transition-all w-32 flex items-center justify-center ${isSessionActive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}
             >
-                {isSessionActive ? 'Stop' : 'Start'}
+                {isSessionActive ? <PauseIcon /> : <PlayIcon />}
+                <span className="ml-2">{isSessionActive ? 'Stop' : 'Start'}</span>
             </button>
             <button
                 onClick={() => setViewMode(viewMode === ViewMode.SCENE_3D ? ViewMode.SESSION_POV : ViewMode.SCENE_3D)}
@@ -89,10 +97,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = (props) => {
                 title="Toggle View"
                 aria-label="Toggle 3D Scene and POV mode"
               >
-                {viewMode === ViewMode.SCENE_3D ? 
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg> :
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7l8 4" /></svg>
-                }
+                {viewMode === ViewMode.SCENE_3D ? <EyeIcon /> : <CubeIcon />}
             </button>
         </div>
         <div>
@@ -106,15 +111,18 @@ export const ControlPanel: React.FC<ControlPanelProps> = (props) => {
             max="100"
             value={volume}
             onChange={(e) => setVolume(parseInt(e.target.value, 10))}
-            className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-brand-outline"
-            style={{ accentColor: '#a8a8ff' }}
+            className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-brand-outline range-input"
+            style={{ '--accent-color': activeChakra.color } as React.CSSProperties}
           />
         </div>
       </div>
 
       {/* Active Chakra Details Card */}
-      <div className="bg-brand-bg/30 p-4 rounded-lg space-y-2 border-2 transition-colors duration-300" style={{ borderColor: activeChakra.color }}>
-         <h3 className="text-lg font-semibold" style={{ color: activeChakra.color }}>{activeChakra.name.toUpperCase()} CHAKRA</h3>
+      <div
+        className="bg-brand-bg/30 p-4 rounded-lg border-2 transition-colors duration-300 chakra-card"
+        style={{ '--accent-color': activeChakra.color } as React.CSSProperties}
+      >
+         <h3 className="text-lg font-semibold chakra-card-header">{activeChakra.name.toUpperCase()} CHAKRA</h3>
          <p className="text-sm text-brand-text-muted h-10">{activeChakra.description}</p>
          <div>
           <label htmlFor="frequency" className="block text-sm font-medium text-brand-text-muted">
@@ -128,8 +136,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = (props) => {
             step="0.1"
             value={frequencies[activeChakraIndex]}
             onChange={(e) => setFrequency(activeChakraIndex, parseFloat(e.target.value))}
-            className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-brand-outline"
-            style={{ accentColor: activeChakra.color }}
+            className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-brand-outline range-input"
+            style={{ '--accent-color': activeChakra.color } as React.CSSProperties}
           />
         </div>
       </div>
@@ -154,7 +162,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = (props) => {
                 <div className="text-center text-brand-text-muted py-8">No sessions logged yet.</div>
             )}
             {sessionLogs.slice().reverse().map(log => (
-                <div key={log.id} className="bg-brand-bg/50 p-3 rounded-lg border-l-4" style={{ borderColor: chakras[log.chakraIndex].color }}>
+                <div
+                  key={log.id}
+                  className="bg-brand-bg/50 p-3 rounded-lg border-l-4 session-log-item"
+                  style={{ '--chakra-color': chakras[log.chakraIndex].color } as React.CSSProperties}
+                >
                     <div className="flex justify-between items-start">
                         <div>
                             <p className="font-bold text-brand-text">{chakras[log.chakraIndex].name}</p>

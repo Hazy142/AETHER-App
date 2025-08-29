@@ -1,0 +1,20 @@
+.chakra-selector[aria-pressed="true"] {
+  background-color: var(--chakra-color);
+  border-color: var(--chakra-color);
+}
+
+.range-input {
+  accent-color: var(--accent-color);
+}
+
+.chakra-card {
+  border-color: var(--accent-color);
+}
+
+.chakra-card-header {
+  color: var(--accent-color);
+}
+
+.session-log-item {
+  border-left-color: var(--chakra-color);
+}

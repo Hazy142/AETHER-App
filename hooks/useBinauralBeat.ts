@@ -14,34 +14,45 @@ export const useBinauralBeat = (
   const leftOscillatorRef = useRef<OscillatorNode | null>(null);
   const rightOscillatorRef = useRef<OscillatorNode | null>(null);
 
-  // Sets up the audio graph. Idempotent.
+  // Sets up the audio graph. Idempotent and safe.
   const setupAudioGraph = useCallback(() => {
     if (audioContextRef.current) return audioContextRef.current;
-    
-    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
-    audioContextRef.current = context;
 
-    const gainNode = context.createGain();
-    gainNode.gain.setValueAtTime(0, context.currentTime);
-    gainNode.connect(context.destination);
-    gainNodeRef.current = gainNode;
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) {
+      console.error("AudioContext is not supported in this browser.");
+      return null;
+    }
 
-    const merger = context.createChannelMerger(2);
-    merger.connect(gainNode);
+    try {
+      const context = new AudioContextClass();
+      audioContextRef.current = context;
 
-    const leftOscillator = context.createOscillator();
-    leftOscillator.type = 'sine';
-    leftOscillator.connect(merger, 0, 0);
-    leftOscillator.start();
-    leftOscillatorRef.current = leftOscillator;
+      const gainNode = context.createGain();
+      gainNode.gain.setValueAtTime(0, context.currentTime);
+      gainNode.connect(context.destination);
+      gainNodeRef.current = gainNode;
 
-    const rightOscillator = context.createOscillator();
-    rightOscillator.type = 'sine';
-    rightOscillator.connect(merger, 0, 1);
-    rightOscillator.start();
-    rightOscillatorRef.current = rightOscillator;
-    
-    return context;
+      const merger = context.createChannelMerger(2);
+      merger.connect(gainNode);
+
+      const leftOscillator = context.createOscillator();
+      leftOscillator.type = 'sine';
+      leftOscillator.connect(merger, 0, 0);
+      leftOscillator.start();
+      leftOscillatorRef.current = leftOscillator;
+
+      const rightOscillator = context.createOscillator();
+      rightOscillator.type = 'sine';
+      rightOscillator.connect(merger, 0, 1);
+      rightOscillator.start();
+      rightOscillatorRef.current = rightOscillator;
+      
+      return context;
+    } catch (error) {
+      console.error("Failed to initialize AudioContext:", error);
+      return null;
+    }
   }, []);
   
   // Effect to handle play/stop state
@@ -98,7 +109,7 @@ export const useBinauralBeat = (
   // Function to be called on user gesture to initialize and resume the AudioContext
   const triggerUserInteraction = useCallback(() => {
     const context = setupAudioGraph();
-    if (context.state === 'suspended') {
+    if (context && context.state === 'suspended') {
       context.resume();
     }
   }, [setupAudioGraph]);
