@@ -78,7 +78,7 @@ function App() {
   return (
     <>
       <main className="w-screen h-screen flex flex-col md:flex-row bg-brand-bg">
-        {/* Tippfehler korrigiert: lg:w-1/4 */}
+        {/* === KORRIGIERTE ZEILE UNTEN === */}
         <div className="md:w-1/3 lg:w-1/4 h-auto md:h-full flex-shrink-0">
           <ControlPanel
             chakras={CHAKRAS}
@@ -101,7 +101,6 @@ function App() {
               activeChakra={activeChakra}
               activeFrequency={frequencies[activeChakraIndex]}
               isSessionActive={isSessionActive}
-              // Performance-Hinweis: Diese Logik am besten in die ThreeScene-Komponente mit useFrame verschieben.
               intensity={currentSession ? Math.min(1, (Date.now() - currentSession.startTime!) / 60000) : 0}
             />
           ) : (
