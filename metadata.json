@@ -1,0 +1,5 @@
+{
+  "name": "AETHER Digital Simulation",
+  "description": "A web-based digital simulation of the AETHER multisensory bioenergetic therapy platform. This application provides a functional test environment for the combined light and frequency therapy concepts, featuring 3D visualization, frequency controls, and real-time auditory (binaural beats) and visual (screen-based light stimulation) feedback.",
+  "requestFramePermissions": []
+}
