@@ -4,6 +4,7 @@ import { OrbitControls, Torus, Points, PointMaterial, useGLTF } from '@react-thr
 import * as THREE from 'three';
 import { ChakraPoints } from './ChakraPoints';
 import { CHAKRAS } from '../constants/chakras';
+import { Chakra } from '@/types';
 
 interface MagneticFieldProps {
   color: string;
@@ -117,14 +118,14 @@ const AvatarModel = () => {
     );
 };
 interface ThreeSceneProps {
-    activeChakra: number;
+    activeChakra: Chakra;
     activeFrequency: number;
     isSessionActive: boolean;
     intensity: number;
 }
 
 export const ThreeScene: React.FC<ThreeSceneProps> = ({ activeChakra, activeFrequency, isSessionActive, intensity }) => {
-    const activeChakraColor = activeChakra >= 0 ? CHAKRAS[activeChakra].color : '#ffffff';
+    const activeChakraColor = activeChakra.color;
     return (
         <div className="w-full h-full bg-black rounded-lg">
             <Canvas 
@@ -150,7 +151,8 @@ export const ThreeScene: React.FC<ThreeSceneProps> = ({ activeChakra, activeFreq
                     <HelmholtzCoils />
                     <AvatarModel />
                     <ChakraPoints 
-                        activeChakra={activeChakra}
+                        // === HIER IST DIE KORREKTUR ===
+                        activeChakra={CHAKRAS.findIndex(c => c.name === activeChakra.name)}
                         intensity={intensity}
                     />
                     <MagneticField
