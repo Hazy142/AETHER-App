@@ -7,6 +7,20 @@ import { SessionView } from './components/SessionView';
 import { FeedbackModal } from './components/FeedbackModal';
 import { ViewMode, SessionLog } from './types';
 
+// Separate Interface für aktive Sessions
+interface ActiveSession {
+  id: string;
+  startTime: number;
+  chakraIndex: number;
+  frequency: number;
+}
+
+// Interface für abgeschlossene Sessions (vor Feedback)
+interface CompletedSession extends ActiveSession {
+  endTime: number;
+  duration: number;
+}
+
 function App() {
   const [activeChakraIndex, setActiveChakraIndex] = useState(3);
   const [frequencies, setFrequencies] = useState<number[]>(CHAKRAS.map(c => c.defaultHz));
@@ -14,8 +28,8 @@ function App() {
   const [volume, setVolume] = useState(25);
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.SCENE_3D);
   const [sessionLogs, setSessionLogs] = useState<SessionLog[]>([]);
-  const [currentSession, setCurrentSession] = useState<Partial<SessionLog> | null>(null);
-  const [pendingFeedbackSession, setPendingFeedbackSession] = useState<Omit<SessionLog, 'userRating' | 'userNotes'> | null>(null);
+  const [currentSession, setCurrentSession] = useState<ActiveSession | null>(null);
+  const [pendingFeedbackSession, setPendingFeedbackSession] = useState<CompletedSession | null>(null);
 
   const { triggerUserInteraction } = useBinauralBeat(
     isSessionActive,
@@ -29,6 +43,7 @@ function App() {
     setIsSessionActive(prev => {
       const isNowActive = !prev;
       if (isNowActive) {
+        // Neue aktive Session erstellen
         setCurrentSession({
           id: Date.now().toString(),
           startTime: Date.now(),
@@ -36,14 +51,15 @@ function App() {
           frequency: frequencies[activeChakraIndex],
         });
       } else {
+        // Session beenden
         if (currentSession && currentSession.startTime) {
           const endTime = Date.now();
-          const sessionToEnd = {
+          const completedSession: CompletedSession = {
             ...currentSession,
             endTime,
             duration: (endTime - currentSession.startTime) / 1000,
-          } as Omit<SessionLog, 'userRating' | 'userNotes'>;
-          setPendingFeedbackSession(sessionToEnd);
+          };
+          setPendingFeedbackSession(completedSession);
           setCurrentSession(null);
         }
       }
@@ -77,8 +93,7 @@ function App() {
   
   return (
     <>
-      <main className="w-screen h-screen flex flex-col md:flex-row bg-brand-bg">
-        {/* === KORRIGIERTE ZEILE UNTEN === */}
+      <div className="w-screen h-screen flex flex-col md:flex-row bg-brand-bg">
         <div className="md:w-1/3 lg:w-1/4 h-auto md:h-full flex-shrink-0">
           <ControlPanel
             chakras={CHAKRAS}
@@ -95,37 +110,39 @@ function App() {
             sessionLogs={sessionLogs}
           />
         </div>
+        
         <div className="flex-grow h-full relative p-4">
           { (viewMode === ViewMode.SCENE_3D) ? (
-            <ThreeScene 
-              activeChakra={activeChakraIndex} 
+            <ThreeScene
+              activeChakra={activeChakraIndex}
               activeFrequency={frequencies[activeChakraIndex]}
               isSessionActive={isSessionActive}
               intensity={currentSession ? Math.min(1, (Date.now() - currentSession.startTime!) / 60000) : 0}
             />
           ) : (
             <div className="w-full h-full bg-black rounded-lg flex items-center justify-center text-center p-8">
-              <div className="z-10 relative">
-                <h2 className="text-4xl font-bold mb-2" style={{color: activeChakra.color}}>
-                  {activeChakra.name} Chakra Session
-                </h2>
-                <p className="text-2xl text-brand-text-muted">{frequencies[activeChakraIndex].toFixed(1)} Hz</p>
-                <p className="mt-4 text-brand-text-muted">You are in POV mode. The screen simulates the light therapy goggles. <br/>Use the view toggle in the control panel to return to the 3D scene.</p>
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold text-brand-text">{activeChakra.name} Chakra Session</h2>
+                <div className="text-6xl font-mono text-brand-text">{frequencies[activeChakraIndex].toFixed(1)} Hz</div>
+                <p className="text-brand-text-muted max-w-md">
+                  You are in POV mode. The screen simulates the light therapy goggles. 
+                  Use the view toggle in the control panel to return to the 3D scene.
+                </p>
               </div>
             </div>
           )
           }
+          
           <SessionView 
-            frequency={frequencies[activeChakraIndex]} 
+            frequency={frequencies[activeChakraIndex]}
             color={activeChakra.color}
             isActive={isSessionActive && viewMode === ViewMode.SESSION_POV}
           />
         </div>
-      </main>
+      </div>
       {pendingFeedbackSession && (
-        <FeedbackModal 
-          session={pendingFeedbackSession} 
-          chakra={CHAKRAS[pendingFeedbackSession.chakraIndex]}
+        <FeedbackModal
+          session={pendingFeedbackSession}
           onSave={handleSaveSession}
           onCancel={handleCancelFeedback}
         />

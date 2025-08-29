@@ -49,7 +49,6 @@ const MagneticField: React.FC<MagneticFieldProps> = ({ color, frequency, isActiv
   );
 };
 
-
 const HelmholtzCoils = () => {
   const R = 1.2; // Radius der Spulen
   const T = 0.05; // Dicke der Spulen
@@ -71,17 +70,17 @@ const HelmholtzCoils = () => {
 
   return (
     <group>
-      {/* Y-Achsen-Paar (horizontal) */}
-      <Coil position={[0, distance/2, 0]} rotation={[0, 0, 0]} />
-      <Coil position={[0, -distance/2, 0]} rotation={[0, 0, 0]} />
-
-      {/* X-Achsen-Paar (vertikal) */}
-      <Coil position={[distance/2, 0, 0]} rotation={[0, 0, Math.PI/2]} />
+      {/* X-Achsen-Paar (links/rechts) */}
       <Coil position={[-distance/2, 0, 0]} rotation={[0, 0, Math.PI/2]} />
+      <Coil position={[distance/2, 0, 0]} rotation={[0, 0, Math.PI/2]} />
 
-      {/* Z-Achsen-Paar (vertikal) */}
-      <Coil position={[0, 0, distance/2]} rotation={[Math.PI/2, 0, 0]} />
+      {/* Y-Achsen-Paar (oben/unten) */}
+      <Coil position={[0, -distance/2, 0]} rotation={[0, 0, 0]} />
+      <Coil position={[0, distance/2, 0]} rotation={[0, 0, 0]} />
+
+      {/* Z-Achsen-Paar (vorne/hinten) */}
       <Coil position={[0, 0, -distance/2]} rotation={[Math.PI/2, 0, 0]} />
+      <Coil position={[0, 0, distance/2]} rotation={[Math.PI/2, 0, 0]} />
     </group>
   );
 };
@@ -99,7 +98,12 @@ const AvatarModel = () => {
   }, [scene]);
 
   return (
-    <primitive object={scene} scale={[1, 1, 1]} position={[0, -0.5, 0]} />
+    <primitive 
+      object={scene} 
+      scale={[1, 1, 1]} 
+      position={[0, -0.8, 0]} 
+      rotation={[0, 0, 0]}
+    />
   );
 };
 
@@ -112,6 +116,7 @@ interface ThreeSceneProps {
 
 export const ThreeScene: React.FC<ThreeSceneProps> = ({ activeChakra, activeFrequency, isSessionActive, intensity }) => {
   const activeChakraColor = activeChakra >= 0 ? CHAKRAS[activeChakra].color : '#ffffff';
+  
   return (
     <div className="w-full h-full">
       <Canvas
