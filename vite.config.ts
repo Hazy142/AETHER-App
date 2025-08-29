@@ -1,16 +1,10 @@
-// vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import tailwindcss from 'postcss'
-import postcss from 'postcss'
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineConfig({
-  plugins: [react()],
-  css: {
-    postcss: {
-      plugins: {
-        tailwindcss: {},
-        autoprefixer: {},
-      },
-    },
-  },
+  plugins: [
+    react(),
+    tailwindcss()  // ← Das ist der korrekte Tailwind v4 Plugin!
+  ],
 })
