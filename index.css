@@ -1,2 +1,87 @@
-@import 'tailwindcss'
+@import 'tailwindcss';
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a21;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a33;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8a8aa0;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom range slider styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-track {
+  background: transparent;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: currentColor;
+  border: 2px solid #1a1a21;
+  box-shadow: 0 0 10px currentColor;
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px currentColor;
+}
+
+/* Focus states */
+input:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(26, 26, 33, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Subtle text selection */
+::selection {
+  background: rgba(168, 168, 255, 0.3);
+  color: #e0e0ff;
+}
+
+/* Shimmer animation background */
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+}
 
