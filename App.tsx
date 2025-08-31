@@ -143,6 +143,7 @@ function App() {
       {pendingFeedbackSession && (
         <FeedbackModal
           session={pendingFeedbackSession}
+          chakra={CHAKRAS[pendingFeedbackSession.chakraIndex]}
           onSave={handleSaveSession}
           onCancel={handleCancelFeedback}
         />
